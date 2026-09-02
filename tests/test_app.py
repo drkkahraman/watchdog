@@ -1,9 +1,10 @@
 """Test full WatchdogApp Textual application lifecycle."""
 
 import pytest
+
 from watchdog.ui.app import WatchdogApp
-from watchdog.ui.widgets.header_stats import HeaderStatsWidget
 from watchdog.ui.widgets.container_table import ContainerTableWidget
+from watchdog.ui.widgets.header_stats import HeaderStatsWidget
 from watchdog.ui.widgets.service_table import ServiceTableWidget
 
 
