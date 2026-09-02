@@ -2,10 +2,10 @@
 
 import pytest
 
-from watchdog.ui.app import WatchdogApp
-from watchdog.ui.widgets.container_table import ContainerTableWidget
-from watchdog.ui.widgets.header_stats import HeaderStatsWidget
-from watchdog.ui.widgets.service_table import ServiceTableWidget
+from watchdog_tui.ui.app import WatchdogApp
+from watchdog_tui.ui.widgets.container_table import ContainerTableWidget
+from watchdog_tui.ui.widgets.header_stats import HeaderStatsWidget
+from watchdog_tui.ui.widgets.service_table import ServiceTableWidget
 
 
 @pytest.mark.asyncio

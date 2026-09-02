@@ -4,7 +4,7 @@ import time
 
 import psutil
 
-from watchdog.models import SystemStats
+from watchdog_tui.models import SystemStats
 
 
 class SystemMonitor:

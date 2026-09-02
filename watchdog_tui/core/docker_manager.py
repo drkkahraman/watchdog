@@ -5,7 +5,7 @@ from typing import Any
 import docker
 from docker.errors import APIError, DockerException, NotFound
 
-from watchdog.models import ContainerInfo, ContainerPort, ContainerStats
+from watchdog_tui.models import ContainerInfo, ContainerPort, ContainerStats
 
 
 class DockerManager:

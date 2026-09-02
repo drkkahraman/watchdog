@@ -2,7 +2,7 @@
 
 import re
 
-from watchdog.models import ContainerInfo, ProxyRoute
+from watchdog_tui.models import ContainerInfo, ProxyRoute
 
 
 class ProxyDetector:

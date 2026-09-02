@@ -6,17 +6,17 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import Footer, Input, TabbedContent, TabPane
 
-from watchdog.core.docker_manager import DockerManager
-from watchdog.core.proxy_detector import ProxyDetector
-from watchdog.core.system_monitor import SystemMonitor
-from watchdog.models import ContainerInfo
-from watchdog.ui.widgets.confirm_modal import ConfirmModal
-from watchdog.ui.widgets.container_table import ContainerTableWidget
-from watchdog.ui.widgets.header_stats import HeaderStatsWidget
-from watchdog.ui.widgets.help_modal import HelpModal
-from watchdog.ui.widgets.inspect_modal import InspectModal
-from watchdog.ui.widgets.log_modal import LogModal
-from watchdog.ui.widgets.service_table import ServiceTableWidget
+from watchdog_tui.core.docker_manager import DockerManager
+from watchdog_tui.core.proxy_detector import ProxyDetector
+from watchdog_tui.core.system_monitor import SystemMonitor
+from watchdog_tui.models import ContainerInfo
+from watchdog_tui.ui.widgets.confirm_modal import ConfirmModal
+from watchdog_tui.ui.widgets.container_table import ContainerTableWidget
+from watchdog_tui.ui.widgets.header_stats import HeaderStatsWidget
+from watchdog_tui.ui.widgets.help_modal import HelpModal
+from watchdog_tui.ui.widgets.inspect_modal import InspectModal
+from watchdog_tui.ui.widgets.log_modal import LogModal
+from watchdog_tui.ui.widgets.service_table import ServiceTableWidget
 
 
 class WatchdogApp(App):

@@ -66,7 +66,7 @@ Heavy monitoring platforms like **Grafana / Prometheus / Portainer** require ded
 Install Watchdog globally to your system in a single command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/doruk/watchdog/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/drkkahraman/watchdog/main/install.sh | bash
 ```
 
 ---
@@ -77,7 +77,7 @@ curl -sSL https://raw.githubusercontent.com/doruk/watchdog/main/install.sh | bas
 
 ```bash
 # Install directly from GitHub
-pipx install git+https://github.com/doruk/watchdog.git
+pipx install git+https://github.com/drkkahraman/watchdog.git
 
 # Or install from local directory
 pipx install .
@@ -95,7 +95,7 @@ watchdog
 python3 -m pip install --user .
 
 # Or directly from GitHub
-python3 -m pip install --user git+https://github.com/doruk/watchdog.git
+python3 -m pip install --user git+https://github.com/drkkahraman/watchdog.git
 ```
 
 > **Note**: Make sure `~/.local/bin` is in your `PATH`. If not, add `export PATH="$HOME/.local/bin:$PATH"` to your `~/.bashrc` or `~/.zshrc`.
@@ -106,7 +106,7 @@ python3 -m pip install --user git+https://github.com/doruk/watchdog.git
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/doruk/watchdog.git
+git clone https://github.com/drkkahraman/watchdog.git
 cd watchdog
 
 # 2. Set up virtual environment

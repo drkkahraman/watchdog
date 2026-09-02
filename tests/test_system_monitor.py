@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from watchdog.core.system_monitor import SystemMonitor
+from watchdog_tui.core.system_monitor import SystemMonitor
 
 
 def test_system_monitor_get_stats():

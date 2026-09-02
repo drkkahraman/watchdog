@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from watchdog.core.docker_manager import DockerManager
+from watchdog_tui.core.docker_manager import DockerManager
 
 
 def test_docker_manager_stats_calculation():

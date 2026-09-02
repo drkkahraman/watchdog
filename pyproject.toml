@@ -44,17 +44,17 @@ dev = [
 ]
 
 [project.scripts]
-watchdog = "watchdog.cli:main"
-watchdog-tui = "watchdog.cli:main"
+watchdog = "watchdog_tui.cli:main"
+watchdog-tui = "watchdog_tui.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/doruk/watchdog"
-Repository = "https://github.com/doruk/watchdog"
-"Bug Tracker" = "https://github.com/doruk/watchdog/issues"
+Homepage = "https://github.com/drkkahraman/watchdog"
+Repository = "https://github.com/drkkahraman/watchdog"
+"Bug Tracker" = "https://github.com/drkkahraman/watchdog/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["watchdog*"]
+include = ["watchdog_tui*"]
 
 [tool.ruff]
 line-length = 120

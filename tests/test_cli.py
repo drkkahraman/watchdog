@@ -1,6 +1,6 @@
 """Tests for CLI argument parsing."""
 
-from watchdog.cli import create_parser
+from watchdog_tui.cli import create_parser
 
 
 def test_cli_parser_defaults():

@@ -3,8 +3,8 @@
 import argparse
 import sys
 
-from watchdog import __app_name__, __version__
-from watchdog.ui.app import WatchdogApp
+from watchdog_tui import __app_name__, __version__
+from watchdog_tui.ui.app import WatchdogApp
 
 
 def create_parser() -> argparse.ArgumentParser:

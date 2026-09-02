@@ -1,7 +1,7 @@
 """Tests for Reverse Proxy and Port route detection."""
 
-from watchdog.core.proxy_detector import ProxyDetector
-from watchdog.models import ContainerInfo, ContainerPort
+from watchdog_tui.core.proxy_detector import ProxyDetector
+from watchdog_tui.models import ContainerInfo, ContainerPort
 
 
 def test_proxy_detector_traefik_and_ports():

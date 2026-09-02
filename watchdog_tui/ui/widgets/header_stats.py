@@ -6,7 +6,7 @@ from textual.app import ComposeResult
 from textual.containers import Container, Grid, Horizontal
 from textual.widgets import Static
 
-from watchdog.models import SystemStats
+from watchdog_tui.models import SystemStats
 
 
 class HeaderStatsWidget(Container):

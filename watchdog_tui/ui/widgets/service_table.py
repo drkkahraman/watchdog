@@ -6,7 +6,7 @@ from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
 from textual.widgets import DataTable, Input, Static
 
-from watchdog.models import ProxyRoute
+from watchdog_tui.models import ProxyRoute
 
 
 class ServiceTableWidget(Container):

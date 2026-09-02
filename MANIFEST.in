@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include install.sh
+recursive-include watchdog_tui *.tcss *.py

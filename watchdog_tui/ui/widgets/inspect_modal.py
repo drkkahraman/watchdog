@@ -8,7 +8,7 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, RichLog, Static, TabbedContent, TabPane
 
-from watchdog.models import ContainerInfo
+from watchdog_tui.models import ContainerInfo
 
 
 class InspectModal(ModalScreen):

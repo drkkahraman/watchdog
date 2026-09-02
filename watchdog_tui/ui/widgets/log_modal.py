@@ -6,8 +6,8 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, RichLog, Static
 
-from watchdog.core.docker_manager import DockerManager
-from watchdog.models import ContainerInfo
+from watchdog_tui.core.docker_manager import DockerManager
+from watchdog_tui.models import ContainerInfo
 
 
 class LogModal(ModalScreen):

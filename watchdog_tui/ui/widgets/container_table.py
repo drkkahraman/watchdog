@@ -7,7 +7,7 @@ from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import DataTable, Input, Static
 
-from watchdog.models import ContainerInfo
+from watchdog_tui.models import ContainerInfo
 
 
 class ContainerTableWidget(Container):
