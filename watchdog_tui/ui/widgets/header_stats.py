@@ -1,4 +1,4 @@
-"""Header overview statistics widget."""
+"""Header overview statistics widget with live telemetry."""
 
 import humanize
 from rich.text import Text
@@ -9,6 +9,13 @@ from textual.widgets import Static
 from watchdog_tui.models import SystemStats
 
 
+def _make_bar(pct: float, width: int = 8) -> str:
+    """Generate compact ASCII progress bar."""
+    filled = int(round((pct / 100.0) * width))
+    filled = max(0, min(width, filled))
+    return "█" * filled + "░" * (width - filled)
+
+
 class HeaderStatsWidget(Container):
     """Header displaying Host & Docker telemetry."""
 
@@ -16,8 +23,8 @@ class HeaderStatsWidget(Container):
     HeaderStatsWidget {
         height: auto;
         dock: top;
-        background: #1e293b;
-        border-bottom: solid #334155;
+        background: #0f172a;
+        border-bottom: solid #1e293b;
         padding: 0 1;
     }
     """
@@ -48,18 +55,18 @@ class HeaderStatsWidget(Container):
 
             # Network
             with Container(classes="stat-card", id="card-net"):
-                yield Static("HOST NETWORK", classes="stat-card-title")
+                yield Static("NETWORK I/O", classes="stat-card-title")
                 yield Static("▲ 0 B/s", classes="stat-card-value", id="val-net")
                 yield Static("▼ 0 B/s", classes="stat-card-sub", id="sub-net")
 
             # Docker stats
             with Container(classes="stat-card", id="card-docker"):
-                yield Static("CONTAINERS", classes="stat-card-title")
+                yield Static("DOCKER ENGINE", classes="stat-card-title")
                 yield Static("0 Running", classes="stat-card-value", id="val-docker")
                 yield Static("0 Total / 0 Img", classes="stat-card-sub", id="sub-docker")
 
     def update_stats(self, stats: SystemStats, docker_info: dict) -> None:
-        """Update widget with latest system and docker telemetry."""
+        """Update widget with latest system and docker telemetry in English."""
         # Docker status bar
         docker_status_widget = self.query_one("#brand-docker-status", Static)
         if docker_info.get("connected"):
@@ -67,15 +74,15 @@ class HeaderStatsWidget(Container):
             os_name = docker_info.get("os", "Linux")
             docker_status_widget.update(
                 Text.assemble(
-                    ("● DOCKER CONNECTED ", "bold green"),
-                    (f"| Engine: v{v} ({os_name})", "dim")
+                    ("● CONNECTED ", "bold green"),
+                    (f"| Engine v{v} ({os_name})", "dim")
                 )
             )
         else:
-            err = docker_info.get("error", "Not reachable")
+            err = docker_info.get("error", "Daemon unreachable")
             docker_status_widget.update(
                 Text.assemble(
-                    ("● DOCKER DISCONNECTED ", "bold red"),
+                    ("● DISCONNECTED ", "bold red"),
                     (f"| {err}", "italic red")
                 )
             )
@@ -84,7 +91,8 @@ class HeaderStatsWidget(Container):
         cpu_val = self.query_one("#val-cpu", Static)
         cpu_sub = self.query_one("#sub-cpu", Static)
         cpu_color = "green" if stats.cpu_percent < 60 else "yellow" if stats.cpu_percent < 85 else "red"
-        cpu_val.update(Text(f"{stats.cpu_percent:.1f}%", style=f"bold {cpu_color}"))
+        bar_cpu = _make_bar(stats.cpu_percent, 8)
+        cpu_val.update(Text.assemble((f"[{bar_cpu}] ", "dim"), (f"{stats.cpu_percent:.1f}%", f"bold {cpu_color}")))
         freq_str = f" @ {stats.cpu_freq_mhz:.0f}MHz" if stats.cpu_freq_mhz > 0 else ""
         cpu_sub.update(f"{stats.cpu_count} Cores{freq_str}")
 
@@ -92,7 +100,8 @@ class HeaderStatsWidget(Container):
         mem_val = self.query_one("#val-mem", Static)
         mem_sub = self.query_one("#sub-mem", Static)
         mem_color = "green" if stats.memory_percent < 70 else "yellow" if stats.memory_percent < 88 else "red"
-        mem_val.update(Text(f"{stats.memory_percent:.1f}%", style=f"bold {mem_color}"))
+        bar_mem = _make_bar(stats.memory_percent, 8)
+        mem_val.update(Text.assemble((f"[{bar_mem}] ", "dim"), (f"{stats.memory_percent:.1f}%", f"bold {mem_color}")))
         used_str = humanize.naturalsize(stats.memory_used, binary=True)
         total_str = humanize.naturalsize(stats.memory_total, binary=True)
         mem_sub.update(f"{used_str} / {total_str}")
@@ -101,7 +110,8 @@ class HeaderStatsWidget(Container):
         disk_val = self.query_one("#val-disk", Static)
         disk_sub = self.query_one("#sub-disk", Static)
         disk_color = "green" if stats.disk_percent < 75 else "yellow" if stats.disk_percent < 90 else "red"
-        disk_val.update(Text(f"{stats.disk_percent:.1f}%", style=f"bold {disk_color}"))
+        bar_disk = _make_bar(stats.disk_percent, 8)
+        disk_val.update(Text.assemble((f"[{bar_disk}] ", "dim"), (f"{stats.disk_percent:.1f}%", f"bold {disk_color}")))
         d_used = humanize.naturalsize(stats.disk_used, binary=True)
         d_total = humanize.naturalsize(stats.disk_total, binary=True)
         disk_sub.update(f"{d_used} / {d_total}")
@@ -123,5 +133,5 @@ class HeaderStatsWidget(Container):
         images = docker_info.get("images_count", 0)
 
         doc_val.update(Text(f"{running} Running", style="bold green" if running > 0 else "bold white"))
-        extra_str = f" ({paused} p)" if paused > 0 else ""
-        doc_sub.update(f"{total} Total{extra_str} | {images} Imgs")
+        extra_str = f" ({paused} paused)" if paused > 0 else ""
+        doc_sub.update(f"{total} Total{extra_str} | {images} Images")

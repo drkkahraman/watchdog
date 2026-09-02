@@ -1,6 +1,5 @@
 """Reverse Proxy and Port Forwardings View."""
 
-
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
@@ -26,7 +25,7 @@ class ServiceTableWidget(Container):
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="search-container"):
-            yield Input(placeholder="🔍 Filter routes, domains, ports, or containers...", id="service-search-input")
+            yield Input(placeholder="🔍 Filter routes by domain, container, service type, or port...", id="service-search-input")
             yield Static("0 routes detected", id="service-status-label")
 
         yield DataTable(id="services-table", cursor_type="row", zebra_stripes=True)
@@ -39,7 +38,7 @@ class ServiceTableWidget(Container):
             "ENTRYPOINT / HOST",
             "RULE / DOMAIN",
             "TARGET PORT",
-            "TLS/SSL",
+            "SSL/TLS",
             "DETAILS",
         )
 
@@ -71,7 +70,6 @@ class ServiceTableWidget(Container):
         table.clear()
 
         for r in filtered:
-            # Service type styling
             type_style = "bold magenta" if "Traefik" in r.service_type else (
                 "bold green" if "Caddy" in r.service_type else (
                     "bold cyan" if "Nginx" in r.service_type else "bold yellow"

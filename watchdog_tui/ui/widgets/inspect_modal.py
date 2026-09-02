@@ -26,28 +26,23 @@ class InspectModal(ModalScreen):
     def compose(self) -> ComposeResult:
         with Vertical(classes="modal-dialog"):
             yield Static(
-                f"🔍 Inspect: {self.container.name} ({self.container.short_id})",
+                f"🔍 Inspect Container: {self.container.name} ({self.container.short_id})",
                 classes="modal-title"
             )
 
             with TabbedContent():
-                # Overview Tab
                 with TabPane("Overview"):
                     yield RichLog(id="inspect-overview-log", highlight=True, markup=True)
 
-                # Environment Variables Tab
                 with TabPane("Environment"):
                     yield RichLog(id="inspect-env-log", highlight=True, markup=True)
 
-                # Networks & Ports Tab
                 with TabPane("Network & Ports"):
                     yield RichLog(id="inspect-net-log", highlight=True, markup=True)
 
-                # Mounts / Volumes Tab
                 with TabPane("Mounts & Volumes"):
                     yield RichLog(id="inspect-mounts-log", highlight=True, markup=True)
 
-                # Raw JSON Tab
                 with TabPane("Raw JSON"):
                     yield RichLog(id="inspect-raw-log", highlight=True, markup=True)
 
@@ -73,9 +68,9 @@ class InspectModal(ModalScreen):
         overview_log.write(f"[bold cyan]Restart Count:[/bold cyan] {raw.get('RestartCount', 0)}")
         overview_log.write(f"[bold cyan]Platform:[/bold cyan] {raw.get('Platform', 'linux')}")
         overview_log.write(f"[bold cyan]Driver:[/bold cyan] {raw.get('Driver', 'N/A')}")
-        overview_log.write(f"[bold cyan]Cmd:[/bold cyan] {' '.join(config.get('Cmd') or [])}")
+        overview_log.write(f"[bold cyan]Command:[/bold cyan] {' '.join(config.get('Cmd') or [])}")
         overview_log.write(f"[bold cyan]Entrypoint:[/bold cyan] {' '.join(config.get('Entrypoint') or [])}")
-        overview_log.write(f"[bold cyan]WorkingDir:[/bold cyan] {config.get('WorkingDir') or '/'}")
+        overview_log.write(f"[bold cyan]Working Directory:[/bold cyan] {config.get('WorkingDir') or '/'}")
 
         # 2. Environment
         env_log = self.query_one("#inspect-env-log", RichLog)
@@ -84,7 +79,6 @@ class InspectModal(ModalScreen):
             for env in sorted(env_vars):
                 if "=" in env:
                     k, v = env.split("=", 1)
-                    # Hide password values slightly for safety
                     if any(secret in k.lower() for secret in ("pass", "secret", "token", "key")):
                         v_disp = v[:3] + "********" if len(v) > 3 else "********"
                     else:

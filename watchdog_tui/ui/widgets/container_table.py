@@ -1,17 +1,22 @@
-"""Interactive Container List and Detail Table."""
-
+"""Interactive Container List and Details View."""
 
 import humanize
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import Button, DataTable, Input, Static
+from textual.widgets import DataTable, Input, Static
 
 from watchdog_tui.models import ContainerInfo
 
 
+def _make_mini_bar(pct: float, width: int = 5) -> str:
+    filled = int(round((pct / 100.0) * width))
+    filled = max(0, min(width, filled))
+    return "█" * filled + "░" * (width - filled)
+
+
 class ContainerTableWidget(Container):
-    """Main container data table with search, quick details, and action toolbar."""
+    """Container data table with live metrics, search filter, and quick details."""
 
     DEFAULT_CSS = """
     ContainerTableWidget {
@@ -25,23 +30,13 @@ class ContainerTableWidget(Container):
         self.containers: list[ContainerInfo] = []
         self.filter_query: str = ""
         self.selected_container_id: str | None = None
-        self._row_keys: dict[str, str] = {}  # container_id -> row_key
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="search-container"):
-            yield Input(placeholder="🔍 Type / or press 'f' to filter containers (name, image, status)...", id="container-search-input")
+            yield Input(placeholder="🔍 Search containers by name, image, status, or port (Press / or f to focus)...", id="container-search-input")
             yield Static("0 containers", id="filter-status-label")
 
         yield DataTable(id="containers-table", cursor_type="row", zebra_stripes=True)
-
-        # Interactive Quick Action Bar
-        with Horizontal(id="container-action-bar"):
-            yield Button("▶ Başlat (A)", id="btn-start", variant="success", classes="action-btn")
-            yield Button("⏹ Durdur (T)", id="btn-stop", variant="error", classes="action-btn")
-            yield Button("↻ Restart (R)", id="btn-restart", variant="primary", classes="action-btn")
-            yield Button("🗑️ Sil / Delete (X)", id="btn-remove", variant="error", classes="action-btn")
-            yield Button("📋 Loglar (L)", id="btn-logs", variant="default", classes="action-btn")
-            yield Button("🔍 Detaylar (I)", id="btn-inspect", variant="default", classes="action-btn")
 
         with Horizontal(id="quick-details-pane"):
             with Vertical(id="quick-details-left"):
@@ -53,27 +48,12 @@ class ContainerTableWidget(Container):
                 yield Static("", id="detail-line-5", classes="detail-line")
                 yield Static("", id="detail-line-6", classes="detail-line")
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        btn_id = event.button.id
-        if btn_id == "btn-start":
-            self.app.action_start_container()
-        elif btn_id == "btn-stop":
-            self.app.action_stop_container()
-        elif btn_id == "btn-restart":
-            self.app.action_restart_container()
-        elif btn_id == "btn-remove":
-            self.app.action_remove_container()
-        elif btn_id == "btn-logs":
-            self.app.action_view_logs()
-        elif btn_id == "btn-inspect":
-            self.app.action_inspect_container()
-
     def on_mount(self) -> None:
         table = self.query_one("#containers-table", DataTable)
         table.add_columns(
             "STATUS",
             "NAME",
-            "ID",
+            "CONTAINER ID",
             "IMAGE",
             "CPU %",
             "MEMORY",
@@ -90,6 +70,8 @@ class ContainerTableWidget(Container):
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         self._update_selected_from_cursor()
+        # Open logs on Enter/Selection
+        self.app.action_view_logs()
 
     def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
         self._update_selected_from_cursor()
@@ -106,9 +88,7 @@ class ContainerTableWidget(Container):
         """Get the currently highlighted container."""
         if not self.selected_container_id:
             filtered = self._get_filtered_containers()
-            if filtered:
-                return filtered[0]
-            return None
+            return filtered[0] if filtered else None
 
         for c in self.containers:
             if c.id == self.selected_container_id or c.short_id == self.selected_container_id:
@@ -128,6 +108,7 @@ class ContainerTableWidget(Container):
                 or self.filter_query in c.status.lower()
                 or self.filter_query in c.short_id.lower()
                 or (c.health and self.filter_query in c.health.lower())
+                or any(self.filter_query in str(p) for p in c.ports)
             )
         ]
 
@@ -146,9 +127,7 @@ class ContainerTableWidget(Container):
         showing = len(filtered)
         label.update(f"{showing}/{total} containers")
 
-        # Remember previous cursor position if possible
         prev_cursor = table.cursor_row
-
         table.clear()
 
         for c in filtered:
@@ -156,12 +135,15 @@ class ContainerTableWidget(Container):
             status_text = self._format_status(c)
             name_text = Text(c.name, style="bold white")
             id_text = Text(c.short_id, style="dim cyan")
-            img_text = Text(c.image[:32] + "..." if len(c.image) > 35 else c.image, style="bright_black")
+
+            img_display = c.image[:32] + "..." if len(c.image) > 35 else c.image
+            img_text = Text(img_display, style="bright_black")
 
             # CPU
             cpu_val = c.stats.cpu_percent
             cpu_style = "green" if cpu_val < 50 else "yellow" if cpu_val < 80 else "red"
-            cpu_text = Text(f"{cpu_val:5.1f}%", style=cpu_style)
+            cpu_bar = _make_mini_bar(cpu_val, 4)
+            cpu_text = Text.assemble((f"{cpu_bar} ", "dim"), (f"{cpu_val:5.1f}%", cpu_style))
 
             # Memory
             if c.stats.memory_limit > 0:
@@ -227,11 +209,10 @@ class ContainerTableWidget(Container):
     def _format_status(self, c: ContainerInfo) -> Text:
         status = c.status.lower()
         if status == "running":
-            health_str = f" ({c.health})" if c.health else ""
             if c.health == "healthy":
-                return Text(f"● RUNNING{health_str}", style="bold green")
+                return Text("● RUNNING (healthy)", style="bold green")
             elif c.health == "unhealthy":
-                return Text(f"● RUNNING{health_str}", style="bold red")
+                return Text("● RUNNING (unhealthy)", style="bold red")
             elif c.health == "starting":
                 return Text("● STARTING", style="bold yellow")
             return Text("● RUNNING", style="bold green")
@@ -240,7 +221,7 @@ class ContainerTableWidget(Container):
         elif status == "restarting":
             return Text("↻ RESTARTING", style="bold cyan")
         elif status == "exited":
-            return Text("■ EXITED", style="dim red")
+            return Text("■ STOPPED", style="dim red")
         else:
             return Text(f"○ {status.upper()}", style="dim")
 
@@ -249,7 +230,6 @@ class ContainerTableWidget(Container):
         config = raw.get("Config", {})
         net_settings = raw.get("NetworkSettings", {})
 
-        # IP addresses & networks
         networks = list(net_settings.get("Networks", {}).keys())
         ip_addr = net_settings.get("IPAddress") or (
             list(net_settings.get("Networks", {}).values())[0].get("IPAddress")
@@ -257,16 +237,16 @@ class ContainerTableWidget(Container):
         )
 
         cmd = " ".join(config.get("Cmd") or []) if config.get("Cmd") else "None"
-        if len(cmd) > 60:
-            cmd = cmd[:57] + "..."
+        if len(cmd) > 65:
+            cmd = cmd[:62] + "..."
 
         mounts = [
             f"{m.get('Source', '')}:{m.get('Destination', '')}"
             for m in raw.get("Mounts", [])[:2]
         ]
         mounts_str = ", ".join(mounts) if mounts else "None"
-        if len(mounts_str) > 50:
-            mounts_str = mounts_str[:47] + "..."
+        if len(mounts_str) > 55:
+            mounts_str = mounts_str[:52] + "..."
 
         self.query_one("#detail-line-1", Static).update(
             Text.assemble(("Container: ", "bold cyan"), (f"{c.name} ", "bold white"), (f"({c.id[:12]})", "dim"))
@@ -284,7 +264,10 @@ class ContainerTableWidget(Container):
             Text.assemble(("PIDs: ", "bold cyan"), (f"{c.stats.pids}", "white"), (" | Created: ", "bold cyan"), (c.created_at[:19].replace("T", " "), "white"))
         )
         self.query_one("#detail-line-6", Static).update(
-            Text.assemble(("Shortcuts: ", "bold cyan"), ("[R]estart  [S]top/Start  [P]ause  [L]ogs  [I]nspect  [X]Remove", "yellow"))
+            Text.assemble(
+                ("Actions: ", "bold cyan"),
+                ("[S] Start/Stop  [R] Restart  [L] Logs  [I] Inspect  [X] Delete  [P] Pause", "bold yellow")
+            )
         )
 
     def _clear_details_pane(self) -> None:

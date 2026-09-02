@@ -32,12 +32,12 @@ class LogModal(ModalScreen):
     def compose(self) -> ComposeResult:
         with Vertical(classes="modal-dialog"):
             yield Static(
-                f"📋 Logs: {self.container.name} ({self.container.short_id})",
+                f"📋 Live Logs: {self.container.name} ({self.container.short_id})",
                 classes="modal-title"
             )
 
             with Horizontal(id="search-container"):
-                yield Input(placeholder="🔍 Filter log output (regex / text)...", id="log-search-input")
+                yield Input(placeholder="🔍 Search log lines (text / regex)...", id="log-search-input")
                 yield Static(f"Tail: {self.tail_count} lines", id="log-tail-label")
 
             yield RichLog(id="log-text-area", highlight=True, markup=True, wrap=True)
@@ -52,7 +52,6 @@ class LogModal(ModalScreen):
 
     def on_mount(self) -> None:
         self.refresh_logs()
-        # Set periodic log refresh timer
         self.set_interval(2.0, self._auto_refresh)
 
     def _auto_refresh(self) -> None:
@@ -87,7 +86,6 @@ class LogModal(ModalScreen):
             return
 
         for line in lines:
-            # Highlight error/warning keywords
             formatted_line = line
             if "ERROR" in line or "error" in line or "FATAL" in line or "Exception" in line:
                 formatted_line = f"[red]{line}[/red]"

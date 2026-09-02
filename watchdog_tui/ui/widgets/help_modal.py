@@ -27,19 +27,19 @@ class HelpModal(ModalScreen):
         table.add_columns("KEY", "ACTION", "DESCRIPTION")
 
         shortcuts = [
-            ("s", "Start / Stop (Toggle)", "Durdur veya başlat (duruma göre otomatik geçiş)"),
-            ("a", "Start Container", "Seçili container'ı doğrudan başlatır (▶ Start)"),
-            ("t", "Stop Container", "Seçili container'ı onay ile durdurur (⏹ Stop)"),
-            ("k", "Force Kill", "Container'ı beklemeden anında zorla kapatır (SIGKILL)"),
-            ("r", "Restart Container", "Container'ı zarifçe yeniden başlatır (↻ Restart)"),
-            ("x / d / Del", "Delete (Sil)", "Container'ı onay ekranıyla kalıcı olarak siler (🗑️)"),
-            ("p", "Pause / Unpause", "Container süreçlerini askıya alır / devam ettirir"),
-            ("l / Enter", "View Logs", "Canlı akan log izleme ekranını açar (Filtreli & Tail)"),
-            ("i", "Inspect Details", "Container IP, Port, Mount, Env ve ham JSON detayları"),
-            ("f / /", "Filter Containers", "İsme, duruma veya porta göre canlı arama"),
-            ("1 / 2", "Switch Tabs", "Containers ve Reverse Proxy/Ports sekmeleri arası geçiş"),
-            ("?", "Help Modal", "Bu kısayol yardım ekranını açar"),
-            ("q / Ctrl+C", "Quit Watchdog", "Uygulamadan temiz bir şekilde çıkar"),
+            ("s", "Start / Stop (Toggle)", "Start stopped container or prompt confirmation to stop"),
+            ("a", "Start Container", "Directly start the selected container"),
+            ("t", "Stop Container", "Safely stop container with confirmation prompt"),
+            ("k", "Force Kill", "Forcefully terminate container immediately (SIGKILL)"),
+            ("r", "Restart Container", "Gracefully restart container with a 10s timeout"),
+            ("x / d / Del", "Delete Container", "Permanently remove container with confirmation"),
+            ("p", "Pause / Unpause", "Suspend or resume container execution processes"),
+            ("l / Enter", "View Logs", "Open real-time streaming log viewer with tail & filter"),
+            ("i", "Inspect Details", "View environment variables, mounts, networks & raw JSON"),
+            ("f / /", "Filter Containers", "Search containers by name, image, status, or port"),
+            ("1 / 2", "Switch Tabs", "Switch between Containers view and Reverse Proxy matrix"),
+            ("?", "Help Modal", "Show this shortcuts and reference guide"),
+            ("q / Ctrl+C", "Quit Watchdog", "Cleanly exit Watchdog and return to shell"),
         ]
 
         for key, action, desc in shortcuts:

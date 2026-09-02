@@ -35,7 +35,7 @@ class WatchdogApp(App):
         Binding("p", "toggle_pause", "Pause", show=True),
         Binding("l", "view_logs", "Logs", show=True),
         Binding("i", "inspect_container", "Inspect", show=True),
-        Binding("x", "remove_container", "Delete (Sil)", show=True),
+        Binding("x", "remove_container", "Delete", show=True),
         Binding("d", "remove_container", "Delete", show=False),
         Binding("delete", "remove_container", "Delete", show=False),
         Binding("f", "focus_search", "Filter", show=True),
@@ -61,7 +61,7 @@ class WatchdogApp(App):
         yield HeaderStatsWidget(id="header-container")
 
         with TabbedContent(id="main-tabs", initial="tab-containers"):
-            with TabPane("🐳 Containers & Stats (1)", id="tab-containers"):
+            with TabPane("🐳 Containers & Metrics (1)", id="tab-containers"):
                 yield ContainerTableWidget(id="container-table-widget")
 
             with TabPane("🌐 Reverse Proxy & Ports (2)", id="tab-services"):
@@ -156,7 +156,7 @@ class WatchdogApp(App):
         c_widget = self.query_one("#container-table-widget", ContainerTableWidget)
         selected = c_widget.get_selected_container()
         if not selected:
-            self.notify("No container selected. Highlight a container first.", severity="warning")
+            self.notify("No container selected. Highlight a row first.", severity="warning")
             return None
         return selected
 
@@ -166,15 +166,15 @@ class WatchdogApp(App):
         if not c:
             return
 
-        self.notify(f"Restarting '{c.name}'...", severity="information", timeout=3)
+        self.notify(f"Restarting container '{c.name}'...", severity="information", timeout=3)
 
         def _do_restart():
             success, msg = self.docker_manager.restart_container(c.id)
             if success:
-                self.call_from_thread(self.notify, msg, severity="information")
+                self.call_from_thread(self.notify, f"✅ {msg}", severity="information")
                 self.call_from_thread(self._trigger_refresh)
             else:
-                self.call_from_thread(self.notify, msg, severity="error")
+                self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
 
         self.run_worker(_do_restart, thread=True)
 
@@ -188,7 +188,7 @@ class WatchdogApp(App):
             self.notify(f"Container '{c.name}' is already running.", severity="information")
             return
 
-        self.notify(f"Starting '{c.name}'...", severity="information")
+        self.notify(f"Starting container '{c.name}'...", severity="information")
 
         def _do_start():
             success, msg = self.docker_manager.start_container(c.id)
@@ -212,7 +212,7 @@ class WatchdogApp(App):
 
         def on_confirm(confirmed: bool) -> None:
             if confirmed:
-                self.notify(f"Stopping '{c.name}'...", severity="information")
+                self.notify(f"Stopping container '{c.name}'...", severity="information")
 
                 def _do_stop():
                     success, msg = self.docker_manager.stop_container(c.id)
@@ -226,9 +226,9 @@ class WatchdogApp(App):
 
         self.push_screen(
             ConfirmModal(
-                title="🛑 Durdur / Stop Container",
+                title="🛑 Stop Container",
                 message=f"Are you sure you want to stop container '{c.name}' ({c.short_id})?",
-                action_label="Durdur (Stop)",
+                action_label="Stop Container",
                 is_danger=True
             ),
             on_confirm
@@ -246,7 +246,7 @@ class WatchdogApp(App):
 
         def on_confirm(confirmed: bool) -> None:
             if confirmed:
-                self.notify(f"Force killing '{c.name}'...", severity="warning")
+                self.notify(f"Force killing container '{c.name}'...", severity="warning")
 
                 def _do_kill():
                     success, msg = self.docker_manager.kill_container(c.id)
@@ -260,9 +260,9 @@ class WatchdogApp(App):
 
         self.push_screen(
             ConfirmModal(
-                title="⚡ Zorla Kapat / Force Kill",
+                title="⚡ Force Kill Container",
                 message=f"Force kill (SIGKILL) container '{c.name}' immediately without grace period?",
-                action_label="Zorla Kapat (Kill)",
+                action_label="Kill Container",
                 is_danger=True
             ),
             on_confirm
@@ -287,10 +287,10 @@ class WatchdogApp(App):
         def _do_pause():
             success, msg = self.docker_manager.pause_container(c.id)
             if success:
-                self.call_from_thread(self.notify, msg, severity="information")
+                self.call_from_thread(self.notify, f"ℹ️ {msg}", severity="information")
                 self.call_from_thread(self._trigger_refresh)
             else:
-                self.call_from_thread(self.notify, msg, severity="error")
+                self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
 
         self.run_worker(_do_pause, thread=True)
 
@@ -316,23 +316,23 @@ class WatchdogApp(App):
 
         def on_confirm(confirmed: bool) -> None:
             if confirmed:
-                self.notify(f"Removing '{c.name}'...", severity="information")
+                self.notify(f"Deleting container '{c.name}'...", severity="information")
 
                 def _do_remove():
                     success, msg = self.docker_manager.remove_container(c.id, force=True)
                     if success:
-                        self.call_from_thread(self.notify, msg, severity="information")
+                        self.call_from_thread(self.notify, f"🗑️ {msg}", severity="information")
                         self.call_from_thread(self._trigger_refresh)
                     else:
-                        self.call_from_thread(self.notify, msg, severity="error")
+                        self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
 
                 self.run_worker(_do_remove, thread=True)
 
         self.push_screen(
             ConfirmModal(
                 title="⚠️ Delete Container",
-                message=f"Permanently remove container '{c.name}' ({c.short_id})? This cannot be undone.",
-                action_label="Delete",
+                message=f"Permanently delete container '{c.name}' ({c.short_id})? This cannot be undone.",
+                action_label="Delete Permanently",
                 is_danger=True
             ),
             on_confirm
