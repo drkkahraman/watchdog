@@ -15,11 +15,11 @@
 </div>
 
 ```text
-  _       _____  _________  ______  __  __  ____  ______ 
- | |     / /   |/_  __/   |/_  __/ / / / / / __ \/ ____/ 
- | | /| / / /| | / / / /| | / /   / /_/ / / / / / / __   
- | |/ |/ / ___ |/ / / ___ |/ /   / __  / / /_/ / /_/ /   
- |__/|__/_/  |_/_/ /_/  |_/_/   /_/ /_/  \____/\____/    
+__        __  _  _____  ____  _   _  ____    ___    ____ 
+ \ \      / / / \|_   _|/ ___|| | | ||  _ \  / _ \  / ___|
+  \ \ /\ / / / _ \ | | | |    | |_| || | | || | | || | __ 
+   \ V  V / / ___ \| | | |___ |  _  || |_| || |_| || |_\ \
+    \_/\_/ /_/   \_\_|  \____||_| |_||____/  \___/  \____/
                                                          
    Real-time Docker & Service Monitor for Homelabs and Servers
 ```
@@ -61,17 +61,48 @@ Heavy monitoring platforms like **Grafana / Prometheus / Portainer** require ded
 
 ## 🚀 Installation
 
-### Option 1: Using `pip` or `pipx` (Recommended)
+### Option 1: One-Liner Quick Install (No manual venv needed)
+
+Install Watchdog globally to your system in a single command:
 
 ```bash
-# Using pipx (isolated environment)
-pipx install git+https://github.com/doruk/watchdog.git
-
-# Or with standard pip
-pip install git+https://github.com/doruk/watchdog.git
+curl -sSL https://raw.githubusercontent.com/doruk/watchdog/main/install.sh | bash
 ```
 
-### Option 2: From Source (Development)
+---
+
+### Option 2: Using `pipx` (Recommended for Python CLI apps)
+
+[`pipx`](https://pypa.github.io/pipx/) installs the CLI in an isolated environment automatically and makes the `watchdog` command globally accessible everywhere:
+
+```bash
+# Install directly from GitHub
+pipx install git+https://github.com/doruk/watchdog.git
+
+# Or install from local directory
+pipx install .
+
+# Run from any terminal!
+watchdog
+```
+
+---
+
+### Option 3: Using `pip --user` (Global User Install)
+
+```bash
+# Global user installation without virtualenv
+python3 -m pip install --user .
+
+# Or directly from GitHub
+python3 -m pip install --user git+https://github.com/doruk/watchdog.git
+```
+
+> **Note**: Make sure `~/.local/bin` is in your `PATH`. If not, add `export PATH="$HOME/.local/bin:$PATH"` to your `~/.bashrc` or `~/.zshrc`.
+
+---
+
+### Option 4: From Source (Development / Virtual Environment)
 
 ```bash
 # 1. Clone repository
