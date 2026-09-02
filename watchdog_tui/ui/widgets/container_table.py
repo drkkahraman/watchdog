@@ -5,13 +5,13 @@ import humanize
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import DataTable, Input, Static
+from textual.widgets import Button, DataTable, Input, Static
 
 from watchdog_tui.models import ContainerInfo
 
 
 class ContainerTableWidget(Container):
-    """Main container data table with search and quick details."""
+    """Main container data table with search, quick details, and action toolbar."""
 
     DEFAULT_CSS = """
     ContainerTableWidget {
@@ -34,6 +34,15 @@ class ContainerTableWidget(Container):
 
         yield DataTable(id="containers-table", cursor_type="row", zebra_stripes=True)
 
+        # Interactive Quick Action Bar
+        with Horizontal(id="container-action-bar"):
+            yield Button("▶ Başlat (A)", id="btn-start", variant="success", classes="action-btn")
+            yield Button("⏹ Durdur (T)", id="btn-stop", variant="error", classes="action-btn")
+            yield Button("↻ Restart (R)", id="btn-restart", variant="primary", classes="action-btn")
+            yield Button("🗑️ Sil / Delete (X)", id="btn-remove", variant="error", classes="action-btn")
+            yield Button("📋 Loglar (L)", id="btn-logs", variant="default", classes="action-btn")
+            yield Button("🔍 Detaylar (I)", id="btn-inspect", variant="default", classes="action-btn")
+
         with Horizontal(id="quick-details-pane"):
             with Vertical(id="quick-details-left"):
                 yield Static("Select a container to view details", id="detail-line-1", classes="detail-line")
@@ -43,6 +52,21 @@ class ContainerTableWidget(Container):
                 yield Static("", id="detail-line-4", classes="detail-line")
                 yield Static("", id="detail-line-5", classes="detail-line")
                 yield Static("", id="detail-line-6", classes="detail-line")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        btn_id = event.button.id
+        if btn_id == "btn-start":
+            self.app.action_start_container()
+        elif btn_id == "btn-stop":
+            self.app.action_stop_container()
+        elif btn_id == "btn-restart":
+            self.app.action_restart_container()
+        elif btn_id == "btn-remove":
+            self.app.action_remove_container()
+        elif btn_id == "btn-logs":
+            self.app.action_view_logs()
+        elif btn_id == "btn-inspect":
+            self.app.action_inspect_container()
 
     def on_mount(self) -> None:
         table = self.query_one("#containers-table", DataTable)

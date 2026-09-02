@@ -365,6 +365,17 @@ class DockerManager:
         except Exception as e:
             return False, f"Failed to stop: {e!s}"
 
+    def kill_container(self, container_id: str, signal: str = "SIGKILL") -> tuple[bool, str]:
+        """Force kill container immediately."""
+        if not self.is_connected or not self.client:
+            return False, "Docker daemon not connected"
+        try:
+            container = self.client.containers.get(container_id)
+            container.kill(signal=signal)
+            return True, f"Container '{container.name}' killed"
+        except Exception as e:
+            return False, f"Failed to kill: {e!s}"
+
     def pause_container(self, container_id: str) -> tuple[bool, str]:
         """Pause or unpause container depending on current state."""
         if not self.is_connected or not self.client:

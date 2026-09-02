@@ -1,6 +1,6 @@
 """Tests for Watchdog data models."""
 
-from watchdog_tui.models import ContainerInfo, ContainerPort, ContainerStats, ProxyRoute, SystemStats
+from watchdog_tui.models import ContainerInfo, ContainerPort, ProxyRoute, SystemStats
 
 
 def test_container_port_str():

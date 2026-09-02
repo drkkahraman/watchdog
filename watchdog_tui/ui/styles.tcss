@@ -134,10 +134,24 @@ DataTable > .datatable--hover {
     border: solid #1e293b;
 }
 
+/* Quick Action Toolbar */
+#container-action-bar {
+    height: 3;
+    background: #1e293b;
+    border-top: solid #334155;
+    padding: 0 1;
+    align: left middle;
+}
+
+.action-btn {
+    margin-right: 1;
+    min-width: 14;
+}
+
 /* Quick Details Panel */
 #quick-details-pane {
     height: 7;
-    background: #1e293b;
+    background: #0f172a;
     border-top: solid #334155;
     padding: 0 1;
     layout: horizontal;

@@ -29,10 +29,15 @@ class WatchdogApp(App):
         Binding("q", "quit", "Quit", show=True),
         Binding("r", "restart_container", "Restart", show=True),
         Binding("s", "toggle_start_stop", "Start/Stop", show=True),
+        Binding("a", "start_container", "Start", show=False),
+        Binding("t", "stop_container", "Stop", show=False),
+        Binding("k", "kill_container", "Kill", show=False),
         Binding("p", "toggle_pause", "Pause", show=True),
         Binding("l", "view_logs", "Logs", show=True),
         Binding("i", "inspect_container", "Inspect", show=True),
-        Binding("x", "remove_container", "Remove", show=True),
+        Binding("x", "remove_container", "Delete (Sil)", show=True),
+        Binding("d", "remove_container", "Delete", show=False),
+        Binding("delete", "remove_container", "Delete", show=False),
         Binding("f", "focus_search", "Filter", show=True),
         Binding("slash", "focus_search", "Filter", show=False),
         Binding("1", "tab_containers", "Containers", show=True),
@@ -173,50 +178,105 @@ class WatchdogApp(App):
 
         self.run_worker(_do_restart, thread=True)
 
-    def action_toggle_start_stop(self) -> None:
-        """Start container if stopped, or stop with confirm if running."""
+    def action_start_container(self) -> None:
+        """Start container directly."""
+        c = self._get_active_container()
+        if not c:
+            return
+
+        if c.is_running:
+            self.notify(f"Container '{c.name}' is already running.", severity="information")
+            return
+
+        self.notify(f"Starting '{c.name}'...", severity="information")
+
+        def _do_start():
+            success, msg = self.docker_manager.start_container(c.id)
+            if success:
+                self.call_from_thread(self.notify, f"✅ {msg}", severity="information")
+                self.call_from_thread(self._trigger_refresh)
+            else:
+                self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
+
+        self.run_worker(_do_start, thread=True)
+
+    def action_stop_container(self) -> None:
+        """Stop container with confirmation prompt."""
         c = self._get_active_container()
         if not c:
             return
 
         if not c.is_running:
-            # Start directly
-            self.notify(f"Starting '{c.name}'...", severity="information")
+            self.notify(f"Container '{c.name}' is already stopped.", severity="warning")
+            return
 
-            def _do_start():
-                success, msg = self.docker_manager.start_container(c.id)
-                if success:
-                    self.call_from_thread(self.notify, msg, severity="information")
-                    self.call_from_thread(self._trigger_refresh)
-                else:
-                    self.call_from_thread(self.notify, msg, severity="error")
+        def on_confirm(confirmed: bool) -> None:
+            if confirmed:
+                self.notify(f"Stopping '{c.name}'...", severity="information")
 
-            self.run_worker(_do_start, thread=True)
+                def _do_stop():
+                    success, msg = self.docker_manager.stop_container(c.id)
+                    if success:
+                        self.call_from_thread(self.notify, f"🛑 {msg}", severity="information")
+                        self.call_from_thread(self._trigger_refresh)
+                    else:
+                        self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
+
+                self.run_worker(_do_stop, thread=True)
+
+        self.push_screen(
+            ConfirmModal(
+                title="🛑 Durdur / Stop Container",
+                message=f"Are you sure you want to stop container '{c.name}' ({c.short_id})?",
+                action_label="Durdur (Stop)",
+                is_danger=True
+            ),
+            on_confirm
+        )
+
+    def action_kill_container(self) -> None:
+        """Force kill container immediately."""
+        c = self._get_active_container()
+        if not c:
+            return
+
+        if not c.is_running:
+            self.notify(f"Container '{c.name}' is not running.", severity="warning")
+            return
+
+        def on_confirm(confirmed: bool) -> None:
+            if confirmed:
+                self.notify(f"Force killing '{c.name}'...", severity="warning")
+
+                def _do_kill():
+                    success, msg = self.docker_manager.kill_container(c.id)
+                    if success:
+                        self.call_from_thread(self.notify, f"⚡ {msg}", severity="information")
+                        self.call_from_thread(self._trigger_refresh)
+                    else:
+                        self.call_from_thread(self.notify, f"❌ {msg}", severity="error")
+
+                self.run_worker(_do_kill, thread=True)
+
+        self.push_screen(
+            ConfirmModal(
+                title="⚡ Zorla Kapat / Force Kill",
+                message=f"Force kill (SIGKILL) container '{c.name}' immediately without grace period?",
+                action_label="Zorla Kapat (Kill)",
+                is_danger=True
+            ),
+            on_confirm
+        )
+
+    def action_toggle_start_stop(self) -> None:
+        """Toggle start or stop depending on current container status."""
+        c = self._get_active_container()
+        if not c:
+            return
+        if c.is_running:
+            self.action_stop_container()
         else:
-            # Confirm before stopping
-            def on_confirm(confirmed: bool) -> None:
-                if confirmed:
-                    self.notify(f"Stopping '{c.name}'...", severity="information")
-
-                    def _do_stop():
-                        success, msg = self.docker_manager.stop_container(c.id)
-                        if success:
-                            self.call_from_thread(self.notify, msg, severity="information")
-                            self.call_from_thread(self._trigger_refresh)
-                        else:
-                            self.call_from_thread(self.notify, msg, severity="error")
-
-                    self.run_worker(_do_stop, thread=True)
-
-            self.push_screen(
-                ConfirmModal(
-                    title="🛑 Stop Container",
-                    message=f"Are you sure you want to stop container '{c.name}' ({c.short_id})?",
-                    action_label="Stop Container",
-                    is_danger=True
-                ),
-                on_confirm
-            )
+            self.action_start_container()
 
     def action_toggle_pause(self) -> None:
         """Toggle pause / unpause state."""

@@ -27,18 +27,19 @@ class HelpModal(ModalScreen):
         table.add_columns("KEY", "ACTION", "DESCRIPTION")
 
         shortcuts = [
-            ("r", "Restart Container", "Trigger container restart with a 10s grace period"),
-            ("s", "Start / Stop", "Toggle start or stop state of the selected container"),
-            ("p", "Pause / Unpause", "Suspend or resume container execution processes"),
-            ("l", "View Logs", "Open real-time streaming log viewer with tail & filter"),
-            ("i", "Inspect Details", "Open full container metadata, env vars, networks & JSON"),
-            ("x / d", "Remove Container", "Safely delete container with confirmation prompt"),
-            ("f / /", "Filter Containers", "Quick jump to container search bar"),
-            ("1", "Containers View", "Switch to main Containers dashboard"),
-            ("2", "Services View", "Switch to Reverse Proxy & Port mappings"),
-            ("space", "Pause/Resume in Logs", "Toggles live log tail streaming"),
-            ("?", "Help Modal", "Show this cheatsheet dialog"),
-            ("q / Ctrl+C", "Quit Watchdog", "Exit cleanly to terminal shell"),
+            ("s", "Start / Stop (Toggle)", "Durdur veya başlat (duruma göre otomatik geçiş)"),
+            ("a", "Start Container", "Seçili container'ı doğrudan başlatır (▶ Start)"),
+            ("t", "Stop Container", "Seçili container'ı onay ile durdurur (⏹ Stop)"),
+            ("k", "Force Kill", "Container'ı beklemeden anında zorla kapatır (SIGKILL)"),
+            ("r", "Restart Container", "Container'ı zarifçe yeniden başlatır (↻ Restart)"),
+            ("x / d / Del", "Delete (Sil)", "Container'ı onay ekranıyla kalıcı olarak siler (🗑️)"),
+            ("p", "Pause / Unpause", "Container süreçlerini askıya alır / devam ettirir"),
+            ("l / Enter", "View Logs", "Canlı akan log izleme ekranını açar (Filtreli & Tail)"),
+            ("i", "Inspect Details", "Container IP, Port, Mount, Env ve ham JSON detayları"),
+            ("f / /", "Filter Containers", "İsme, duruma veya porta göre canlı arama"),
+            ("1 / 2", "Switch Tabs", "Containers ve Reverse Proxy/Ports sekmeleri arası geçiş"),
+            ("?", "Help Modal", "Bu kısayol yardım ekranını açar"),
+            ("q / Ctrl+C", "Quit Watchdog", "Uygulamadan temiz bir şekilde çıkar"),
         ]
 
         for key, action, desc in shortcuts:

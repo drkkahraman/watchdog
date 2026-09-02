@@ -3,9 +3,17 @@ set -e
 
 echo "🐕 Installing Watchdog TUI..."
 
+# If inside a virtualenv, install directly
+if [ -n "$VIRTUAL_ENV" ]; then
+    echo "📦 Installing inside active virtualenv ($VIRTUAL_ENV)..."
+    python3 -m pip install . --upgrade
+    echo "✅ Watchdog installed successfully in virtualenv! Run 'watchdog' to start."
+    exit 0
+fi
+
 # Check if pipx is available (recommended for isolated global install)
 if command -v pipx >/dev/null 2>&1; then
-    echo "📦 Using pipx for installation..."
+    echo "📦 Using pipx for global installation..."
     pipx install --force .
     echo "✅ Watchdog installed successfully! Run 'watchdog' to start."
     exit 0
