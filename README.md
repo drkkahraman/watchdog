@@ -1,4 +1,4 @@
-# 🐕 Watchdog: Docker & Service Status Monitor (TUI)
+#  Watchdog: Docker & Service Status Monitor (TUI)
 
 <div align="center">
 
@@ -21,7 +21,7 @@
  | |/ |/ / ___ |/ / / ___ |/ /   / __  / / /_/ / /_/ /   
  |__/|__/_/  |_/_/ /_/  |_/_/   /_/ /_/  \____/\____/    
                                                          
-  🐕 Real-time Docker & Service Monitor for Homelabs and Servers
+   Real-time Docker & Service Monitor for Homelabs and Servers
 ```
 
 ---
@@ -34,9 +34,9 @@ Heavy monitoring platforms like **Grafana / Prometheus / Portainer** require ded
 
 ---
 
-## ✨ Features
+##  Features
 
-- 🐳 **Live Container Dashboard**: Real-time stats for CPU %, Memory usage/limits, Network I/O (Rx/Tx), Block I/O (Read/Write), PIDs, and Healthcheck statuses.
+-  **Live Container Dashboard**: Real-time stats for CPU %, Memory usage/limits, Network I/O (Rx/Tx), Block I/O (Read/Write), PIDs, and Healthcheck statuses.
 - ⚡ **Single-Keystroke Lifecycle Management**:
   - `[R]` Restart container (with grace period & async progress toast)
   - `[S]` Start / Stop container (with confirmation dialog)
@@ -44,18 +44,18 @@ Heavy monitoring platforms like **Grafana / Prometheus / Portainer** require ded
   - `[L]` Open real-time streaming log viewer
   - `[I]` Inspect deep container attributes, environment variables, mounts, and network configuration
   - `[X]` Delete / Kill container safely with confirmation
-- 🌐 **Reverse Proxy & Port Mapping Auto-Discovery**:
+-  **Reverse Proxy & Port Mapping Auto-Discovery**:
   - Automatically identifies container port forwardings (`Host IP:Port -> Container Port`).
   - Auto-detects reverse proxy routing labels from **Traefik**, **Caddy**, and **Nginx Proxy Manager / VIRTUAL_HOST**.
   - Highlights TLS/SSL secured endpoints.
-- 💻 **Host System Telemetry**:
+-  **Host System Telemetry**:
   - Host CPU load %, Cores, Frequency.
   - Memory & Swap usage in real-time.
   - Disk storage capacity and utilization.
   - Real-time Network upload/download bandwidth speed (MB/s, KB/s).
   - Docker daemon version, engine status, and container tally.
-- 🔍 **Fuzzy Search & Filtering**: Press `/` or `f` to instantly filter containers and services by name, status, image, or port.
-- 🎨 **Modern Cyberpunk/Nord Aesthetic**: Crafted with rich colors, status badges, clean tables, and fluid keyboard navigation.
+-  **Fuzzy Search & Filtering**: Press `/` or `f` to instantly filter containers and services by name, status, image, or port.
+-  **Modern Cyberpunk/Nord Aesthetic**: Crafted with rich colors, status badges, clean tables, and fluid keyboard navigation.
 
 ---
 
